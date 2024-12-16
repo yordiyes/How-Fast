@@ -1,19 +1,26 @@
 const express = require('express');
-const axios = require('axios');
-const cors = require('cors');
+const FastSpeedTest = require('fast-speedtest-api');
+const cors = require("cors");
 
 const app = express();
 const port = 5000;
+app.use(cors());
 
-app.use(cors());  // To allow cross-origin requests from your React app
-
+const speedtest = new FastSpeedTest({
+  token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=5", // Replace with your actual token
+  verbose: false,
+  timeout: 10000,
+  https: true,
+  urlCount: 5,
+  bufferSize: 8,
+  unit: FastSpeedTest.UNITS.Mbps,
+});
 app.get('/api/speedtest', async (req, res) => {
   try {
-    const response = await axios.get('https://api.fast.com/netflix-speedtest/v2');
-    res.json(response.data);
+    const speed = await speedtest.getSpeed();
+    res.json({ speed });
   } catch (error) {
-    console.error('Error fetching speed data:', error);
-    res.status(500).json({ error: 'Failed to fetch speed data' });
+    res.status(500).json({ error: error.message });
   }
 });
 

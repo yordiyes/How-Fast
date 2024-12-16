@@ -1,47 +1,68 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
+import one from "../assets/one.png";
+import pause from "../assets/pause.png";
+import play from "../assets/play.png";
 
 export default function SpeedTest() {
-  const [speed, setSpeed] = useState(null);
-  const [ping, setPing] = useState(null);
-  const [upload, setUpload] = useState(null);
+  const [speed, setSpeed] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const fetchSpeed = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/speedtest");
 
-        const data = await response.json();
-
-        setSpeed(data.download_speed);
-        setPing(data.ping);
-        setUpload(data.upload_speed);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-      }
-      fetchSpeed();
-    };
-  }, []);
+  const handleSpeedTest = async () => {
+    setLoading(true);
+    try {
+      document.getElementById("btn")?.querySelector("img")?.setAttribute("src", pause);
+      const response = await fetch("http://localhost:5000/api/speedtest");
+      const data = await response.json();
+      setSpeed(data.speed);
+    } catch (error) {
+      console.error("Error fetching speed data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <TestContainer>
-      <h1>Internet Speed </h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <p>Your download speed: {speed} Mbps</p>
-          <p>Your upload speed: {upload} Mbps</p>
-          <p>Your ping: {ping} ms</p>
-        </>
+      {!loading && (
+        <div className="logo-container">
+          <img src={one} className="logo-img" alt="logo" />
+          <h1 className="header">Fasty</h1>
+        </div>
       )}
+      {loading && <div className="spinner"></div>}
+      <p className="data">
+        {speed.toFixed()} <span>Mps</span>
+      </p>
+      {speed && <p>Download speed: {speed.toFixed(2)} Mbps</p>}
+      <button className="btn" onClick={handleSpeedTest}>
+        <img id="btn" src={play} className="play-btn" alt="pause btn" />
+      </button>
     </TestContainer>
   );
 }
 
 const TestContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .logo-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center:
+    justify-content: center;
+  }
+  .logo-img {
+    width:150px;
+    height: 150px;
+  }
+  .header {
+    margin: 0;  
+    font-size: 4rem;
+    padding: 0 0 40px 0;
+  }
   .data {
     font-size: 3rem;
+    font-weight: 700;
     margin: 0;
   }
   .btn {
@@ -49,16 +70,44 @@ const TestContainer = styled.div`
     font-size: 2.1rem;
     border: none;
     border-radius: 8px;
-    background-color: #4caf50;
+    background: transparent;
     color: white;
-    padding: 5px 30px;
+    padding: 30px 30px;
 
     &:hover {
-      background-color: #45a049;
+      background-color:rgb(209, 215, 210);
     }
 
     &:disabled {
       background-color: #ccc;
     }
   }
+  /* Spinner styles */
+  .spinner {
+    width: 50px; /* Diameter of the spinner */
+    height: 50px;
+    border: 5px solid rgba(0, 0, 0, 0.1); /* Light border */
+    border-top: 5px solid #3498db; /* Blue border */
+    border-radius: 50%; /* Makes it a circle */
+    animation: spin 1s linear infinite; /* Spins continuously */
+  }
+
+  /* Animation keyframes */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg); /* Start position */
+    }
+    to {
+      transform: rotate(360deg); /* End position */
+    }
+  }
+    .pause-btn{
+      width: 40px;
+      height: 40px;
+    }
+    .play-btn{
+      width: 50px;
+      height: 50px;
+    }  
+    
 `;
