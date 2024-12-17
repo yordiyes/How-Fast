@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import styled from "styled-components";
 import one from "../assets/one.png";
 import pause from "../assets/pause.png";
@@ -6,24 +6,42 @@ import play from "../assets/play.png";
 
 export default function SpeedTest() {
   const [speed, setSpeed] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const controller = useRef<AbortController | null>(null);
+  const [more, setMore] = useState(false);
 
   const handleSpeedTest = async () => {
     setLoading(true);
+    controller.current = new AbortController();
+
     try {
-      document.getElementById("btn")?.querySelector("img")?.setAttribute("src", pause);
-      const response = await fetch("http://localhost:5000/api/speedtest");
+      const response = await fetch("http://localhost:5000/api/speedtest", {
+        signal: controller.current.signal,
+      });
       const data = await response.json();
       setSpeed(data.speed);
     } catch (error) {
-      console.error("Error fetching speed data:", error);
+      if ((error as Error).name === "AbortError") {
+        console.log("Speed test aborted");
+      } else {
+        console.error("Error fetching speed data:", (error as Error).message);
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const handlePause = () => {
+    if (controller.current) {
+      controller.current.abort();
+    }
+    setLoading(false);
+  };
+
+
   return (
     <TestContainer>
-      {!loading && (
+      {!loading && speed > 0 && (
         <div className="logo-container">
           <img src={one} className="logo-img" alt="logo" />
           <h1 className="header">Fasty</h1>
@@ -31,12 +49,19 @@ export default function SpeedTest() {
       )}
       {loading && <div className="spinner"></div>}
       <p className="data">
-        {speed.toFixed()} <span>Mps</span>
+        {speed.toFixed()} <span>Mbps</span>
       </p>
-      {speed && <p>Download speed: {speed.toFixed(2)} Mbps</p>}
-      <button className="btn" onClick={handleSpeedTest}>
-        <img id="btn" src={play} className="play-btn" alt="pause btn" />
-      </button>
+      {loading ? (
+        <button className="btn" onClick={handlePause}>
+          <img src={pause} className="play-btn" alt="pause btn" />
+        </button>
+      ) : (
+        <button className="btn" onClick={handleSpeedTest}>
+          <img src={play} className="play-btn" alt="retry btn" />
+        </button>
+      )}
+      <button onClick={() => setMore(true)}>more</button>
+      {more && !loading && speed > 0 && <p>Download speed: {speed.toFixed(2)} Mbps</p>}
     </TestContainer>
   );
 }
@@ -72,7 +97,7 @@ const TestContainer = styled.div`
     border-radius: 8px;
     background: transparent;
     color: white;
-    padding: 30px 30px;
+    padding: 20px 20px;
 
     &:hover {
       background-color:rgb(209, 215, 210);
