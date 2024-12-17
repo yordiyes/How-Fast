@@ -3,12 +3,13 @@ import styled from "styled-components";
 import one from "../assets/one.png";
 import pause from "../assets/pause.png";
 import play from "../assets/play.png";
-
+import { BiLogoTelegram } from "react-icons/bi";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaFacebook } from "react-icons/fa6";
 export default function SpeedTest() {
   const [speed, setSpeed] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const controller = useRef<AbortController | null>(null);
-  const [more, setMore] = useState(false);
 
   const handleSpeedTest = async () => {
     setLoading(true);
@@ -19,7 +20,9 @@ export default function SpeedTest() {
         signal: controller.current.signal,
       });
       const data = await response.json();
-      setSpeed(data.speed);
+
+      const speedInKbps = data.speed * 1000;
+      setSpeed(speedInKbps);
     } catch (error) {
       if ((error as Error).name === "AbortError") {
         console.log("Speed test aborted");
@@ -38,30 +41,55 @@ export default function SpeedTest() {
     setLoading(false);
   };
 
+  const displaySpeed = () => {
+    const isKbps = speed < 1000;
+
+    return isKbps ? (
+      speed === 0 ? (
+        <p className="data">{speed.toFixed()}</p>
+      ) : (
+        <p className="data">
+          {speed.toFixed()} <span>Kbps</span>
+        </p>
+      )
+    ) : (
+      <p className="data">
+        {(speed / 1000).toFixed()} <span>Mbps</span>
+      </p>
+    );
+  };
 
   return (
     <TestContainer>
-      {!loading && speed > 0 && (
-        <div className="logo-container">
-          <img src={one} className="logo-img" alt="logo" />
-          <h1 className="header">Fasty</h1>
-        </div>
-      )}
+      <div className="logo-container">
+        <img src={one} className="logo-img" alt="logo" />
+        <h1 className="header">Fasty</h1>
+      </div>
       {loading && <div className="spinner"></div>}
-      <p className="data">
-        {speed.toFixed()} <span>Mbps</span>
-      </p>
+      {displaySpeed()}
+      {!loading && speed > 0 && (
+        <p className="dn-load-p">
+          Download speed:{" "}
+          <b className="dn-load">{(speed / 1000).toFixed(2)} Mbps</b>
+        </p>
+      )}
       {loading ? (
         <button className="btn" onClick={handlePause}>
-          <img src={pause} className="play-btn" alt="pause btn" />
+          <img src={pause} className="pause-btn" alt="pause btn" />
         </button>
       ) : (
-        <button className="btn" onClick={handleSpeedTest}>
+        <button className="btn btn-play" onClick={handleSpeedTest}>
           <img src={play} className="play-btn" alt="retry btn" />
         </button>
       )}
-      <button onClick={() => setMore(true)}>more</button>
-      {more && !loading && speed > 0 && <p>Download speed: {speed.toFixed(2)} Mbps</p>}
+
+      {!loading && speed > 0 && (
+        <div>
+          <BiLogoTelegram className="icons" />
+          <FaXTwitter className="icons" />
+          <FaFacebook className="icons" />
+        </div>
+      )}
     </TestContainer>
   );
 }
@@ -70,11 +98,15 @@ const TestContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  height: 100vh; 
+  padding-top: 20px;
   .logo-container{
     display: flex;
     flex-direction: column;
     align-items: center:
     justify-content: center;
+    margin-top: 0;
   }
   .logo-img {
     width:150px;
@@ -91,39 +123,45 @@ const TestContainer = styled.div`
     margin: 0;
   }
   .btn {
-    margin-top: 0.6rem;
-    font-size: 2.1rem;
+    font-size: 1rem;
     border: none;
     border-radius: 8px;
     background: transparent;
     color: white;
-    padding: 20px 20px;
+    padding: 10px;
 
     &:hover {
-      background-color:rgb(209, 215, 210);
+      background-color:rgb(159, 170, 179);
+      cursor: pointer;
     }
 
     &:disabled {
       background-color: #ccc;
     }
   }
+    .btn-play{
+      font-size: 2.5;
+    }
+      .dn-load{
+        color: #1535ab;
+      }
   /* Spinner styles */
   .spinner {
-    width: 50px; /* Diameter of the spinner */
-    height: 50px;
-    border: 5px solid rgba(0, 0, 0, 0.1); /* Light border */
-    border-top: 5px solid #3498db; /* Blue border */
-    border-radius: 50%; /* Makes it a circle */
-    animation: spin 1s linear infinite; /* Spins continuously */
+    width: 35px; 
+    height: 35px;
+    border: 5px solid rgba(0, 0, 0, 0.1); 
+    border-top: 5px solid #1535ab; 
+    border-radius: 50%; 
+    animation: spin 1s linear infinite; 
   }
 
   /* Animation keyframes */
   @keyframes spin {
     from {
-      transform: rotate(0deg); /* Start position */
+      transform: rotate(0deg); 
     }
     to {
-      transform: rotate(360deg); /* End position */
+      transform: rotate(360deg); 
     }
   }
     .pause-btn{
@@ -134,5 +172,22 @@ const TestContainer = styled.div`
       width: 50px;
       height: 50px;
     }  
-    
+    .more-p{
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .more-p:hover:{
+      cursor:
+    }
+    .icons{
+      font-size:1.8rem;
+      margin: 40px 10px; 
+      color: #1535ab;
+    }
+    .icons:hover{
+      cursor: pointer;
+    }
+    .dn-load-p{
+    font-size: 1.2rem;
+    }
 `;

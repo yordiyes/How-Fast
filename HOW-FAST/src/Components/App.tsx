@@ -11,9 +11,9 @@ function App() {
 const Container = styled.div`
   padding: 0;
   margin: 0;
-  background-color: rgb(188, 182, 189);
+  background-color: rgb(131, 144, 155);
   height: 100vh;
-  display: flex;
+  display: flex;  
   flex-direction: column;
   align-items: center;
   justify-content: center;
