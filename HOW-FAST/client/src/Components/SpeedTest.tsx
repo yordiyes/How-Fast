@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import one from "../assets/one.png";
 import pause from "../assets/pause.png";
@@ -46,7 +46,7 @@ export default function SpeedTest() {
 
     return isKbps ? (
       speed === 0 ? (
-        <p className="data">{speed.toFixed()}</p>
+        null
       ) : (
         <p className="data">
           {speed.toFixed()} <span>Kbps</span>
@@ -59,6 +59,10 @@ export default function SpeedTest() {
     );
   };
 
+  useEffect(() => {
+    handleSpeedTest();
+  }, []);
+
   return (
     <TestContainer>
       <div className="logo-container">
@@ -66,6 +70,7 @@ export default function SpeedTest() {
         <h1 className="header">Fasty</h1>
       </div>
       {loading && <div className="spinner"></div>}
+      {!loading && speed >0 &&<p>Your internet speed is </p>}
       {displaySpeed()}
       {!loading && speed > 0 && (
         <p className="dn-load-p">
@@ -165,8 +170,8 @@ const TestContainer = styled.div`
     }
   }
     .pause-btn{
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
     }
     .play-btn{
       width: 50px;
