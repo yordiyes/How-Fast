@@ -3,7 +3,7 @@ const FastSpeedTest = require('fast-speedtest-api');
 const cors = require("cors");
 
 const app = express();
-const port = 5000;
+const port = process.env.MY_PORT || 5000;
 app.use(cors());
 
 const speedtest = new FastSpeedTest({
