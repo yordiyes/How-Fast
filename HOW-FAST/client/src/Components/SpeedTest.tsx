@@ -16,7 +16,7 @@ export default function SpeedTest() {
     controller.current = new AbortController();
 
     try {
-      const response = await fetch("http://localhost:5000/api/speedtest", {
+      const response = await fetch(`${import.meta.env.VITE_URL}/api/speedtest`, {
         signal: controller.current.signal,
       });
       const data = await response.json();
