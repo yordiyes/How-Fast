@@ -7,7 +7,7 @@ const port = process.env.MY_PORT || 5000;
 app.use(cors());
 
 const speedtest = new FastSpeedTest({
-  token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=5", // Replace with your actual token
+  token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=5", 
   verbose: false,
   timeout: 10000,
   https: true,
