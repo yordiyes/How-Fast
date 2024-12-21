@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node distindex.js",
+    "start": "node server/index.js",
     "build": "echo 'No build step for JavaScript backend'"
   },
   "dependencies": {
